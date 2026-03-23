@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>GameHub Ultimate</title>
+
+<style>
+body {
+  margin:0;
+  font-family:Arial;
+  background:#0f172a;
+  color:white;
+}
+
+header {
+  background:#020617;
+  padding:15px;
+  text-align:center;
+}
+
+#search {
+  padding:10px;
+  width:60%;
+  margin-top:10px;
+}
+
+nav {
+  text-align:center;
+  padding:10px;
+}
+
+button {
+  margin:5px;
+  padding:10px;
+  cursor:pointer;
+  background:#1e293b;
+  color:white;
+  border:none;
+  border-radius:5px;
+}
+
+button:hover {
+  background:#334155;
+}
+
+#games {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+  gap:15px;
+  padding:20px;
+}
+
+.card {
+  background:#1e293b;
+  padding:15px;
+  border-radius:10px;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+.card:hover {
+  background:#334155;
+  transform:scale(1.03);
+}
+
+iframe {
+  width:100%;
+  height:500px;
+  border:none;
+  border-radius:10px;
+}
+
+#player {
+  padding:20px;
+}
+
+input {
+  padding:8px;
+  border-radius:5px;
+  border:none;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>🎮 GameHub Ultimate</h1>
+
+  <div id="user"></div>
+
+  <input id="search" placeholder="🔍 Spiel suchen...">
+</header>
+
+<nav>
+  <button onclick="filterGames('all')">Alle</button>
+  <button onclick="filterGames('action')">Action</button>
+  <button onclick="filterGames('puzzle')">Puzzle</button>
+</nav>
+
+<div id="games"></div>
+
+<div id="player">
+  <h2>Wähle ein Spiel 👆</h2>
+</div>
+
+<script>
+
+// LOGIN SYSTEM
+let user = localStorage.getItem("user");
+
+function renderUser(){
+  let u = document.getElementById("user");
+
+  if(user){
+    u.innerHTML = `👤 ${user} <button onclick="logout()">Logout</button>`;
+  } else {
+    u.innerHTML = `
+      <input id="name" placeholder="Name">
+      <button onclick="login()">Login</button>
+    `;
+  }
+}
+
+function login(){
+  user = document.getElementById("name").value;
+  localStorage.setItem("user", user);
+  renderUser();
+}
+
+function logout(){
+  localStorage.removeItem("user");
+  user = null;
+  renderUser();
+}
+
+renderUser();
+
+// SPIELE (ECHTE EMBEDS)
+let games = [
+  {name:"2048", cat:"puzzle", url:"https://www.crazygames.com/embed/2048"},
+  {name:"Snake", cat:"action", url:"https://playsnake.org/"},
+  {name:"Slope", cat:"action", url:"https://www.crazygames.com/embed/slope"},
+  {name:"Run 3", cat:"action", url:"https://www.crazygames.com/embed/run-3"},
+  {name:"Drift Hunters", cat:"action", url:"https://www.crazygames.com/embed/drift-hunters"},
+  {name:"Tetris", cat:"puzzle", url:"https://tetris.com/play-tetris"},
+  {name:"Minesweeper", cat:"puzzle", url:"https://minesweeperonline.com/"},
+  {name:"Pacman", cat:"action", url:"https://www.google.com/logos/2010/pacman10-i.html"}
+];
+
+// FAVORITEN
+function toggleFav(name){
+  let favs = JSON.parse(localStorage.getItem("favs") || "[]");
+
+  if(favs.includes(name)){
+    favs = favs.filter(f => f !== name);
+  } else {
+    favs.push(name);
+  }
+
+  localStorage.setItem("favs", JSON.stringify(favs));
+  renderGames(currentList);
+}
+
+// RENDER
+let currentList = games;
+
+function renderGames(list){
+  let g = document.getElementById("games");
+  let favs = JSON.parse(localStorage.getItem("favs") || "[]");
+
+  g.innerHTML = "";
+
+  list.forEach(game=>{
+    g.innerHTML += `
+      <div class="card">
+        <h3 onclick="play('${game.url}')">${game.name}</h3>
+        <p>${game.cat}</p>
+        <button onclick="toggleFav('${game.name}')">
+          ${favs.includes(game.name) ? "⭐ Entfernen" : "☆ Favorit"}
+        </button>
+      </div>
+    `;
+  });
+
+  currentList = list;
+}
+
+// SPIEL STARTEN
+function play(url){
+  document.getElementById("player").innerHTML =
+    `<iframe src="${url}"></iframe>`;
+}
+
+// FILTER
+function filterGames(cat){
+  if(cat === "all"){
+    renderGames(games);
+  } else {
+    renderGames(games.filter(g=>g.cat === cat));
+  }
+}
+
+// SUCHE
+document.getElementById("search").addEventListener("input", e=>{
+  let val = e.target.value.toLowerCase();
+  renderGames(games.filter(g=>g.name.toLowerCase().includes(val)));
+});
+
+renderGames(games);
+
+</script>
+
+</body>
+</html>
