@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>GameHub Ultimate</title>
+<title>GameHub Pro</title>
 
 <style>
 body {
@@ -13,15 +13,17 @@ body {
 }
 
 header {
-  background:#020617;
   padding:15px;
   text-align:center;
+  background:#020617;
 }
 
 #search {
   padding:10px;
   width:60%;
   margin-top:10px;
+  border-radius:10px;
+  border:none;
 }
 
 nav {
@@ -32,11 +34,11 @@ nav {
 button {
   margin:5px;
   padding:10px;
-  cursor:pointer;
   background:#1e293b;
   color:white;
   border:none;
-  border-radius:5px;
+  border-radius:10px;
+  cursor:pointer;
 }
 
 button:hover {
@@ -46,38 +48,63 @@ button:hover {
 #games {
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
-  gap:15px;
+  gap:20px;
   padding:20px;
 }
 
 .card {
   background:#1e293b;
-  padding:15px;
-  border-radius:10px;
+  border-radius:15px;
+  overflow:hidden;
   cursor:pointer;
-  transition:0.2s;
+  transition:0.3s;
+  box-shadow:0 0 0 transparent;
 }
 
 .card:hover {
-  background:#334155;
-  transform:scale(1.03);
+  transform:scale(1.08);
+  box-shadow:0 0 20px rgba(0,255,255,0.5);
+}
+
+.card img {
+  width:100%;
+  height:120px;
+  object-fit:cover;
+}
+
+.card h3 {
+  padding:10px;
+  margin:0;
 }
 
 iframe {
   width:100%;
-  height:500px;
+  height:100%;
   border:none;
-  border-radius:10px;
 }
 
-#player {
-  padding:20px;
+#gameContainer {
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:black;
+  z-index:999;
+  animation: fadeIn 0.3s ease;
 }
 
-input {
-  padding:8px;
-  border-radius:5px;
-  border:none;
+@keyframes fadeIn {
+  from { opacity:0; transform:scale(0.9); }
+  to { opacity:1; transform:scale(1); }
+}
+
+.fadeOut {
+  animation: fadeOut 0.3s forwards;
+}
+
+@keyframes fadeOut {
+  to { opacity:0; transform:scale(0.9); }
 }
 </style>
 </head>
@@ -85,10 +112,7 @@ input {
 <body>
 
 <header>
-  <h1>🎮 GameHub Ultimate</h1>
-
-  <div id="user"></div>
-
+  <h1>🎮 GameHub Pro</h1>
   <input id="search" placeholder="🔍 Spiel suchen...">
 </header>
 
@@ -99,132 +123,88 @@ input {
 </nav>
 
 <div id="games"></div>
-
-<div id="player">
-  <h2>Wähle ein Spiel 👆</h2>
-</div>
+<div id="player"></div>
 
 <script>
 
-// LOGIN SYSTEM
-let user = localStorage.getItem("user");
-
-function renderUser(){
-  let u = document.getElementById("user");
-
-  if(user){
-    u.innerHTML = `👤 ${user} <button onclick="logout()">Logout</button>`;
-  } else {
-    u.innerHTML = `
-      <input id="name" placeholder="Name">
-      <button onclick="login()">Login</button>
-    `;
-  }
-}
-
-function login(){
-  user = document.getElementById("name").value;
-  localStorage.setItem("user", user);
-  renderUser();
-}
-
-function logout(){
-  localStorage.removeItem("user");
-  user = null;
-  renderUser();
-}
-
-renderUser();
-
-// SPIELE (ECHTE EMBEDS)
+// SPIELE MIT BILDERN
 let games = [
-  {name:"2048", cat:"puzzle", url:"https://www.crazygames.com/embed/2048"},
-  {name:"Snake", cat:"action", url:"https://playsnake.org/"},
-  {name:"Slope", cat:"action", url:"https://www.crazygames.com/embed/slope"},
-  {name:"Run 3", cat:"action", url:"https://www.crazygames.com/embed/run-3"},
-  {name:"Drift Hunters", cat:"action", url:"https://www.crazygames.com/embed/drift-hunters"},
-  {name:"Tetris", cat:"puzzle", url:"https://tetris.com/play-tetris"},
-  {name:"Minesweeper", cat:"puzzle", url:"https://minesweeperonline.com/"},
-  {name:"Pacman", cat:"action", url:"https://www.google.com/logos/2010/pacman10-i.html"}
+  {
+    name:"2048",
+    cat:"puzzle",
+    url:"https://www.crazygames.com/embed/2048",
+    img:"https://via.placeholder.com/300x150?text=2048"
+  },
+  {
+    name:"Snake",
+    cat:"action",
+    url:"https://playsnake.org/",
+    img:"https://via.placeholder.com/300x150?text=Snake"
+  },
+  {
+    name:"Slope",
+    cat:"action",
+    url:"https://www.crazygames.com/embed/slope",
+    img:"https://via.placeholder.com/300x150?text=Slope"
+  },
+  {
+    name:"Run 3",
+    cat:"action",
+    url:"https://www.crazygames.com/embed/run-3",
+    img:"https://via.placeholder.com/300x150?text=Run+3"
+  }
 ];
 
-// FAVORITEN
-function toggleFav(name){
-  let favs = JSON.parse(localStorage.getItem("favs") || "[]");
-
-  if(favs.includes(name)){
-    favs = favs.filter(f => f !== name);
-  } else {
-    favs.push(name);
-  }
-
-  localStorage.setItem("favs", JSON.stringify(favs));
-  renderGames(currentList);
-}
-
 // RENDER
-let currentList = games;
-
 function renderGames(list){
   let g = document.getElementById("games");
-  let favs = JSON.parse(localStorage.getItem("favs") || "[]");
-
   g.innerHTML = "";
 
   list.forEach(game=>{
     g.innerHTML += `
-      <div class="card">
-        <h3 onclick="play('${game.url}')">${game.name}</h3>
-        <p>${game.cat}</p>
-        <button onclick="toggleFav('${game.name}')">
-          ${favs.includes(game.name) ? "⭐ Entfernen" : "☆ Favorit"}
-        </button>
+      <div class="card" onclick="play('${game.url}')">
+        <img src="${game.img}">
+        <h3>${game.name}</h3>
       </div>
     `;
   });
-
-  currentList = list;
 }
 
-// SPIEL STARTEN
+// SPIEL START
 function play(url){
   document.getElementById("player").innerHTML = `
-    <button onclick="closeGame()" style="
-      position:fixed;
-      top:10px;
-      right:10px;
-      z-index:1000;
-      padding:10px;
-      background:red;
-      color:white;
-      border:none;
-      border-radius:5px;
-    ">
-      ❌ Beenden
-    </button>
+    <div id="gameContainer">
+      <button onclick="closeGame()" style="
+        position:absolute;
+        top:15px;
+        right:15px;
+        z-index:1000;
+        padding:10px;
+        background:red;
+        color:white;
+        border:none;
+        border-radius:10px;
+      ">❌</button>
 
-function closeGame(){
-  document.getElementById("player").innerHTML = "<h2>Wähle ein Spiel 👆</h2>";
-}
-    <iframe src="${url}" style="
-      position:fixed;
-      top:0;
-      left:0;
-      width:100%;
-      height:100%;
-      border:none;
-      z-index:999;
-    "></iframe>
+      <iframe src="${url}"></iframe>
+    </div>
   `;
+}
+
+// SCHLIESSEN
+function closeGame(){
+  let game = document.getElementById("gameContainer");
+  game.classList.add("fadeOut");
+
+  setTimeout(()=>{
+    document.getElementById("player").innerHTML = "";
+  }, 300);
 }
 
 // FILTER
 function filterGames(cat){
-  if(cat === "all"){
-    renderGames(games);
-  } else {
-    renderGames(games.filter(g=>g.cat === cat));
-  }
+  if(cat === "all") renderGames(games);
+  else renderGames(games.filter(g=>g.cat === cat));
 }
 
 // SUCHE
@@ -239,4 +219,3 @@ renderGames(games);
 
 </body>
 </html>
-
