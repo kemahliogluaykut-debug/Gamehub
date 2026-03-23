@@ -158,7 +158,7 @@ function renderGames(list){
 
   list.forEach(game=>{
     g.innerHTML += `
-      <div class="card" onclick="play('${game.url}')">
+      <div class="card" onclick="window.open('${game.url}', '_blank')"
         <img src="${game.img}">
         <h3>${game.name}</h3>
       </div>
