@@ -1,1 +1,1 @@
-https://github.com/kemahliogluaykut-debug/Gamehub.git
+https://kemahliogluaykut-debug.github.io/Gamehub/
