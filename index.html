@@ -58,7 +58,6 @@ button:hover {
   overflow:hidden;
   cursor:pointer;
   transition:0.3s;
-  box-shadow:0 0 0 transparent;
 }
 
 .card:hover {
@@ -127,35 +126,32 @@ iframe {
 
 <script>
 
-// SPIELE MIT BILDERN
 let games = [
-  {
-    name:"2048",
-    cat:"puzzle",
-    url:"https://www.crazygames.com/embed/2048",
-    img:"https://via.placeholder.com/300x150?text=2048"
-  },
-  {
-    name:"Snake",
-    cat:"action",
-    url:"https://playsnake.org/",
-    img:"https://via.placeholder.com/300x150?text=Snake"
-  },
-  {
-    name:"Slope",
-    cat:"action",
-    url:"https://www.crazygames.com/embed/slope",
-    img:"https://via.placeholder.com/300x150?text=Slope"
-  },
-  {
-    name:"Run 3",
-    cat:"action",
-    url:"https://www.crazygames.com/embed/run-3",
-    img:"https://via.placeholder.com/300x150?text=Run+3"
-  }
+
+{name:"2048", cat:"puzzle", url:"https://www.crazygames.com/embed/2048", img:"https://picsum.photos/300/150?random=1"},
+{name:"Slope", cat:"action", url:"https://www.crazygames.com/embed/slope", img:"https://picsum.photos/300/150?random=2"},
+{name:"Run 3", cat:"action", url:"https://www.crazygames.com/embed/run-3", img:"https://picsum.photos/300/150?random=3"},
+{name:"Drift Hunters", cat:"action", url:"https://www.crazygames.com/embed/drift-hunters", img:"https://picsum.photos/300/150?random=4"},
+{name:"Moto X3M", cat:"action", url:"https://www.crazygames.com/embed/moto-x3m", img:"https://picsum.photos/300/150?random=5"},
+{name:"Basketball Stars", cat:"action", url:"https://www.crazygames.com/embed/basketball-stars", img:"https://picsum.photos/300/150?random=6"},
+{name:"Shell Shockers", cat:"action", url:"https://www.crazygames.com/embed/shellshockers", img:"https://picsum.photos/300/150?random=7"},
+{name:"Paper.io", cat:"action", url:"https://www.crazygames.com/embed/paper-io", img:"https://picsum.photos/300/150?random=8"},
+{name:"Hole.io", cat:"action", url:"https://www.crazygames.com/embed/hole-io", img:"https://picsum.photos/300/150?random=9"},
+{name:"Krunker", cat:"action", url:"https://www.crazygames.com/embed/krunker", img:"https://picsum.photos/300/150?random=10"},
+{name:"Chess", cat:"puzzle", url:"https://www.crazygames.com/embed/chess", img:"https://picsum.photos/300/150?random=11"},
+{name:"Sudoku", cat:"puzzle", url:"https://www.crazygames.com/embed/sudoku", img:"https://picsum.photos/300/150?random=12"},
+{name:"Solitaire", cat:"puzzle", url:"https://www.crazygames.com/embed/solitaire", img:"https://picsum.photos/300/150?random=13"},
+{name:"Tic Tac Toe", cat:"puzzle", url:"https://www.crazygames.com/embed/tic-tac-toe", img:"https://picsum.photos/300/150?random=14"},
+{name:"Mahjong", cat:"puzzle", url:"https://www.crazygames.com/embed/mahjong", img:"https://picsum.photos/300/150?random=15"},
+{name:"Tower Defense", cat:"action", url:"https://www.crazygames.com/embed/tower-defense", img:"https://picsum.photos/300/150?random=16"},
+{name:"Stickman Fight", cat:"action", url:"https://www.crazygames.com/embed/stickman-fight", img:"https://picsum.photos/300/150?random=17"},
+{name:"Subway Surfers", cat:"action", url:"https://www.crazygames.com/embed/subway-surfers", img:"https://picsum.photos/300/150?random=18"},
+{name:"Temple Run", cat:"action", url:"https://www.crazygames.com/embed/temple-run", img:"https://picsum.photos/300/150?random=19"},
+{name:"Idle Miner", cat:"puzzle", url:"https://www.crazygames.com/embed/idle-miner", img:"https://picsum.photos/300/150?random=20"}
+
 ];
 
-// RENDER
+// anzeigen
 function renderGames(list){
   let g = document.getElementById("games");
   g.innerHTML = "";
@@ -170,7 +166,7 @@ function renderGames(list){
   });
 }
 
-// SPIEL START
+// starten
 function play(url){
   document.getElementById("player").innerHTML = `
     <div id="gameContainer">
@@ -185,13 +181,12 @@ function play(url){
         border:none;
         border-radius:10px;
       ">❌</button>
-
       <iframe src="${url}"></iframe>
     </div>
   `;
 }
 
-// SCHLIESSEN
+// schließen
 function closeGame(){
   let game = document.getElementById("gameContainer");
   game.classList.add("fadeOut");
@@ -201,24 +196,22 @@ function closeGame(){
   }, 300);
 }
 
-// FILTER
+// filter
 function filterGames(cat){
   if(cat === "all") renderGames(games);
   else renderGames(games.filter(g=>g.cat === cat));
 }
 
-// SUCHE
+// suche
 document.getElementById("search").addEventListener("input", e=>{
   let val = e.target.value.toLowerCase();
   renderGames(games.filter(g=>g.name.toLowerCase().includes(val)));
 });
 
+// start
 renderGames(games);
 
 </script>
 
 </body>
 </html>
-
-
-let games = [
